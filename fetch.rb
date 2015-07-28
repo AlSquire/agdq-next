@@ -20,5 +20,5 @@ def time_parse(time)
 end
 
 def display(line)
-  "#{line[0].hour}:#{line[0].min}> #{line[1]}"
+  "<#{line[0].strftime('%H:%M')}> #{line[1]}"
 end
