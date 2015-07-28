@@ -16,7 +16,7 @@ def fetch
 end
 
 def time_parse(time)
-  Time.strptime(time, '%m/%d/%Y %H:%M:%S') + 7 * 60 * 60
+  Time.strptime("#{time} +0200", '%m/%d/%Y %H:%M:%S %:z') + 7 * 60 * 60
 end
 
 def display(line)
