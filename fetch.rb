@@ -4,7 +4,7 @@ require 'open-uri'
 def fetch
   url = "https://gamesdonequick.com/schedule"
   doc = Nokogiri::HTML(open(url))
-  times = doc.css('tbody#runTable tr').map do |tr|
+  times = doc.css('#runTable tr').map do |tr|
     time = tr.elements[0].text
     text = tr.elements[1].text
     [time_parse(time), text]
