@@ -4,15 +4,30 @@ require 'open-uri'
 def fetch
   url = "https://gamesdonequick.com/schedule"
   doc = Nokogiri::HTML(open(url))
-  times = doc.css('#runTable tbody tr').map do |tr|
-    time = tr.elements[0].text
-    text = tr.elements[1].text
-    [time_parse(time), text]
+  lines = []
+  current_line = {}
+  doc.css('#runTable tbody tr:not(:last-child)').each do |tr|
+    if tr['class'] != 'second-row'
+      current_line[:time] = tr.elements[0].text
+      current_line[:game] = tr.elements[1].text
+      current_line[:runners] = tr.elements[2].text
+      current_line[:setup] = tr.elements[3].elements[0].text
+    else
+      current_line[:estimate] = tr.elements[0].elements[0].text
+      current_line[:type] = tr.elements[1].text
+
+      lines << current_line
+      current_line = {}
+    end
   end
 
-  now = times.select { |t| t[0] < Time.now }.last
-  incomings = times.select { |t| t[0] > Time.now }[0..5]
-  "Now: #{display(now)} - Incomings: #{incomings.map { |t| display(t) }.join(', ')}"
+  times = lines.map do |l|
+    [time_parse(l[:time]), l[:game]]
+  end
+
+  now = times.select { |t| t[0] < Time.now + 2 * 60 * 60 }.last
+  incomings = times.select { |t| t[0] > Time.now + 2 * 60 * 60 }[0..5]
+  "Now: #{display(now)} | Incomings: #{incomings.map { |t| display(t) }.join(', ')}"
 end
 
 def time_parse(time)
